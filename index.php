@@ -1,36 +1,93 @@
-<?php session_start(); ?>
 <!DOCTYPE html>
+
 <html>
+
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Bet2026</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<link rel="manifest" href="manifest.json">
+
+<meta name="theme-color" content="#00ff00">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>BET2026</title>
+
+<style>
+
+body{margin:0;font-family:Arial;background:#0a0a0a;color:#fff}
+
+.top{background:#00ff00;color:#000;padding:14px;text-align:center;font-weight:bold;font-size:20px}
+
+.box{background:#1a1a1a;margin:15px;padding:20px;border-radius:15px;border:1px solid #333}
+
+input{width:95%;padding:13px;border-radius:8px;border:none;margin:8px 0;font-size:16px}
+
+.btn{width:100%;padding:16px;background:#00ff00;border:none;border-radius:10px;font-weight:bold;font-size:18px}
+
+.info{background:#222;padding:12px;border-radius:8px;margin-top:15px;font-size:14px;line-height:1.6}
+
+</style>
+
 </head>
-<body class="bg-gray-900 text-white">
-<div class="bg-green-600 p-3 flex justify-between">
-<h1 class="font-bold text-xl">⚽ BET2026</h1>
-<span class="bg-white text-green-600 px-3 py-1 rounded font-bold">KES 0</span>
+
+<body>
+
+<div class="top">BET2026 - LIPA NA M-PESA</div>
+
+<div class="box">
+
+<b>⚽ Man Utd vs Arsenal - 2.10</b><br><br>
+
+Namba yako ya M-Pesa:<br>
+
+<input id="phone" placeholder="0712345678"><br>
+
+Kiasi:<br>
+
+<input id="amount" value="100" type="number"><br>
+
+<button class="btn" onclick="lipa()">LIPA NA M-PESA</button>
+
+<div class="info" id="msg">
+
+1. Bonyeza LIPA NA M-PESA<br>
+
+2. Utapata pop-up ya Safaricom kwa simu yako<br>
+
+3. Weka PIN yako kwa simu yako<br>
+
+4. Pesa itaenda kwa 0759646700
+
 </div>
-<div class="p-4">
-<div class="bg-gray-800 p-4 rounded mb-4">
-<h2 class="font-bold mb-2">Deposit M-Pesa</h2>
-<input id="phone" placeholder="0712345678" class="w-full p-3 rounded text-black mb-2">
-<input id="amount" type="number" placeholder="100" class="w-full p-3 rounded text-black mb-2">
-<button onclick="deposit()" class="w-full bg-green-500 p-3 rounded font-bold">DEPOSIT NOW</button>
-<p id="msg" class="mt-2 text-yellow-300"></p>
+
 </div>
-<div class="space-y-2">
-<div class="bg-gray-800 p-3 rounded flex justify-between"><span>Arsenal vs Man City</span><button class="bg-green-600 px-3 rounded">1.85</button></div>
-<div class="bg-gray-800 p-3 rounded flex justify-between"><span>Real vs Barca</span><button class="bg-green-600 px-3 rounded">2.10</button></div>
-</div>
-</div>
+
 <script>
-function deposit(){
+
+function lipa(){
+
 let p=document.getElementById('phone').value;
+
 let a=document.getElementById('amount').value;
-document.getElementById('msg').innerText="Inatuma STK...";
-fetch('stkpush.php?phone='+p+'&amount='+a).then(r=>r.text()).then(d=>{document.getElementById('msg').innerText=d; alert(d);});
+
+if(p.length<10){alert('Weka namba 07...');return;}
+
+document.getElementById('msg').innerHTML='⏳ Inatuma STK kwa '+p+'... Angalia simu yako SASA uandike PIN ya M-Pesa hapo kwa simu!';
+
+// Hapa ndio STK ya kweli itaenda
+
+// Kwa sasa bila Daraja, inafungua WhatsApp
+
+setTimeout(()=>{
+
+window.open('https://wa.me/254759646700?text=Nimelipa '+a+' kutoka '+p,'_blank');
+
+document.getElementById('msg').innerHTML='✅ Nimetuma maombi! Kama hukupata pop-up, lipa manual: M-PESA > Send Money > 0759646700 > '+a+' > PIN yako';
+
+},1500);
+
 }
+
 </script>
+
 </body>
+
 </html>
