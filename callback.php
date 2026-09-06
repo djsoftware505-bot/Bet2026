@@ -1,4 +1,5 @@
 <?php
-file_put_contents("log.txt", file_get_contents("php://input").PHP_EOL, FILE_APPEND);
-echo json_encode(["ResultCode"=>0,"ResultDesc"=>"Success"]);
+$raw = file_get_contents('php://input');
+file_put_contents('mpesa_logs.txt', date('Y-m-d H:i:s')." - $raw\n", FILE_APPEND);
+echo "OK";
 ?>
