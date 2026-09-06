@@ -1,93 +1,56 @@
+<?php
+session_start();
+$bets_file = 'bets.txt';
+$balance = 1250;
+?>
 <!DOCTYPE html>
-
-<html>
-
-<head>
-<link rel="manifest" href="manifest.json">
-
-<meta name="theme-color" content="#00ff00">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-
-<title>BET2026</title>
-
+<html><head><title>Bet2026 Kenya</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-
-body{margin:0;font-family:Arial;background:#0a0a0a;color:#fff}
-
-.top{background:#00ff00;color:#000;padding:14px;text-align:center;font-weight:bold;font-size:20px}
-
-.box{background:#1a1a1a;margin:15px;padding:20px;border-radius:15px;border:1px solid #333}
-
-input{width:95%;padding:13px;border-radius:8px;border:none;margin:8px 0;font-size:16px}
-
-.btn{width:100%;padding:16px;background:#00ff00;border:none;border-radius:10px;font-weight:bold;font-size:18px}
-
-.info{background:#222;padding:12px;border-radius:8px;margin-top:15px;font-size:14px;line-height:1.6}
-
-</style>
-
-</head>
-
-<body>
-
-<div class="top">BET2026 - LIPA NA M-PESA</div>
-
-<div class="box">
-
-<b>⚽ Man Utd vs Arsenal - 2.10</b><br><br>
-
-Namba yako ya M-Pesa:<br>
-
-<input id="phone" placeholder="0712345678"><br>
-
-Kiasi:<br>
-
-<input id="amount" value="100" type="number"><br>
-
-<button class="btn" onclick="lipa()">LIPA NA M-PESA</button>
-
-<div class="info" id="msg">
-
-1. Bonyeza LIPA NA M-PESA<br>
-
-2. Utapata pop-up ya Safaricom kwa simu yako<br>
-
-3. Weka PIN yako kwa simu yako<br>
-
-4. Pesa itaenda kwa 0759646700
-
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial;background:#0a3d0a;color:#fff}
+.head{background:#000;padding:12px;display:flex;justify-content:space-between;align-items:center}
+.logo{color:#ffcc00;font-weight:bold;font-size:20px}
+.bal{background:#ffcc00;color:#000;padding:6px 12px;border-radius:20px;font-weight:bold}
+.leagues{padding:10px}
+.game{background:#fff;color:#000;margin:10px 0;border-radius:10px;padding:12px}
+.teams{display:flex;justify-content:space-between;font-weight:bold}
+.odds{display:flex;gap:8px;margin-top:10px}
+.odd{flex:1;background:#f0f0f0;text-align:center;padding:10px;border-radius:6px;cursor:pointer;border:1px solid #ddd}
+.odd.selected{background:#0a3d0a;color:#fff}
+.slip{position:fixed;bottom:0;left:0;right:0;background:#111;padding:15px;border-top:2px solid #ffcc00}
+input{width:100%;padding:12px;margin:6px 0;border-radius:6px;border:none}
+.btn{background:#00c853;color:#fff;padding:14px;width:100%;border:none;border-radius:6px;font-weight:bold;font-size:16px}
+</style></head><body>
+<div class="head"><div class="logo">BET2026 🇰🇪</div><div class="bal">KES <?=number_format($balance)?></div></div>
+<div class="leagues">
+<h3>⚽ Today Top Games</h3>
+<div class="game"><div class="teams"><span>Arsenal vs Man Utd</span><span>18:00</span></div><div class="odds"><div class="odd" onclick="sel(this,'ARS-W 2.10')">1: 2.10</div><div class="odd" onclick="sel(this,'DRAW 3.20')">X: 3.20</div><div class="odd" onclick="sel(this,'MUN-W 2.90')">2: 2.90</div></div></div>
+<div class="game"><div class="teams"><span>Gor Mahia vs AFC Leopards</span><span>15:00</span></div><div class="odds"><div class="odd" onclick="sel(this,'GOR 1.85')">1: 1.85</div><div class="odd" onclick="sel(this,'DRAW 3.10')">X: 3.10</div><div class="odd" onclick="sel(this,'AFC 4.20')">2: 4.20</div></div></div>
+<div class="game"><div class="teams"><span>Man City vs Liverpool</span><span>19:30</span></div><div class="odds"><div class="odd" onclick="sel(this,'CITY 1.95')">1: 1.95</div><div class="odd" onclick="sel(this,'DRAW 3.40')">X: 3.40</div><div class="odd" onclick="sel(this,'LIV 3.80')">2: 3.80</div></div></div>
+<div style="height:180px"></div>
 </div>
-
+<div class="slip">
+<div id="sliptext" style="margin-bottom:8px;color:#ffcc00">Chagua odd kuweka bet</div>
+<input type="tel" id="phone" placeholder="M-Pesa No: 254712345678" value="254">
+<input type="number" id="amount" placeholder="Amount (Min 20)">
+<button class="btn" onclick="bet()">WEKA BET - LIPA NA M-PESA</button>
 </div>
-
 <script>
-
-function lipa(){
-
-let p=document.getElementById('phone').value;
-
-let a=document.getElementById('amount').value;
-
-if(p.length<10){alert('Weka namba 07...');return;}
-
-document.getElementById('msg').innerHTML='⏳ Inatuma STK kwa '+p+'... Angalia simu yako SASA uandike PIN ya M-Pesa hapo kwa simu!';
-
-// Hapa ndio STK ya kweli itaenda
-
-// Kwa sasa bila Daraja, inafungua WhatsApp
-
-setTimeout(()=>{
-
-window.open('https://wa.me/254759646700?text=Nimelipa '+a+' kutoka '+p,'_blank');
-
-document.getElementById('msg').innerHTML='✅ Nimetuma maombi! Kama hukupata pop-up, lipa manual: M-PESA > Send Money > 0759646700 > '+a+' > PIN yako';
-
-},1500);
-
+let picks=[];
+function sel(el,txt){
+ el.classList.toggle('selected');
+ if(picks.includes(txt)) picks=picks.filter(x=>x!=txt); else picks.push(txt);
+ document.getElementById('sliptext').innerHTML=picks.length?picks.join(' | ')+' - Total Odds: '+(picks.length*2).toFixed(2):'Chagua odd kuweka bet';
 }
-
-</script>
-
-</body>
-
-</html>
+function bet(){
+ let p=document.getElementById('phone').value;
+ let a=document.getElementById('amount').value;
+ if(picks.length==0){alert('Chagua mechi kwanza!');return;}
+ if(a<20){alert('Min 20 KES');return;}
+ if(p.length<12){alert('Weka number kama 2547...');return;}
+ document.querySelector('.btn').innerHTML='TUMA STK...';
+ fetch('stkpush.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:p,amount:a,bets:picks})})
+ .then(r=>r.text()).then(t=>{alert(t);document.querySelector('.btn').innerHTML='WEKA BET - LIPA NA M-PESA';});
+}
+</script></body></html>
